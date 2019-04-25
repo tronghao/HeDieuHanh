@@ -1,0 +1,23 @@
+- Xet Entry chinh 1: <1 byte B>=10h=00010000 (D) => thu muc
+ten ngan: BACKUP~1.DEH
+ten dai: Back up.deHDH
+
+- Xet Entry chinh 2: <1 byte B>=08h=00001000 (V) => nhan dia
+
+voitap tin NC-.EXE ,xac dinh
+a. ngay, gio tao
+<Ngay tao>: <sn 2 byte tai 10h>=2C24h=0010110 0001 00100
+q					22      1    4
+KL: 4/1/2002 (1980+22)
+<Gio tao>: <3 byte tai D>= 4F2A4Ch=01001 111001 010100 1001100
+				      9    57     20      76
+b. kich thuoc = <4 byte tai 1Ch>=00000200h=512 byte
+c. cluster bat dau chua noi dung tap tin
+ <2 byte cao tai 14h>=0000h
+ <2 byte thap tai 1Ah>=005Ch
+kl: cluter bd 0000005Ch=92d
+K=92 (5Ch)
+tim L 
+i=3/2*K=3/2*92=138d (8A)
+2 byte tai 8A: FF 0F
+=>L=FFF

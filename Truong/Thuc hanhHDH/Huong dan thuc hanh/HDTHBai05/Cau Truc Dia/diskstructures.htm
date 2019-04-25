@@ -1,0 +1,1234 @@
+<html><head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document"><title>DiskStructures</title></head>
+
+
+
+
+<body>
+
+
+
+
+<p align="right"><a href="http://www.toolsthatwork.com/bbdocs/index.htm" target="_top"><img src="diskstructures_files/mbutton.gif" alt="Return to Manual Index" border="0" height="27" width="22"></a></p>
+
+
+
+
+<div align="center">
+  <center>
+  <table bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" bgcolor="#f5f5f5" border="2" bordercolor="#ffffff" cellpadding="10" cellspacing="0" height="155" width="90%">
+    <tbody><tr>
+      <td height="155" width="100%">
+
+
+
+
+<p><b><font face="Trebuchet MS" size="3">A Bit more about Disk Structures</font></b></p>
+
+
+
+
+<p><br>
+<font face="Trebuchet MS" size="2"><b><u>
+Bits 'n' Bytes</u></b><br>
+<br>
+To understand how ByteBack D.R.I.S.<font size="1"><sup>TM</sup></font> works or to understand how the built-in disk editor
+can be used to examine and repair logical structures, it's good to have some
+understanding about disk structures. This chapter is meant as a primer and not
+an in-depth description of each and every disk structure.</font></p>
+<p><font face="Trebuchet MS" size="2">You may already know that a computer works with zeros
+and ones. It can only discriminate 2 states: Something is on or something is
+off, something is either true or false etc.. The two states, 0 and 1 are referred to as
+<b>Bits</b>.&nbsp; By
+grouping&nbsp; several bits together the PC can 'grasp' more complex matters, like
+characters in our alphabet or decimal numbers. Eight zeros/ones 'grouped' together
+in one unit are referred to as a <b>Byte</b>. The byte is a very important
+'unit'; values regarding memory or disk sizes are expressed in Kilo-Bytes,
+Mega-Bytes etc.</font></p>
+<p><font face="Trebuchet MS" size="2">Using 8 bits we can define 256 different combinations of zeros and ones (for
+example 00001111, 11110000 etc.). Rather than describing a state using a string
+of 8 zeros and ones, we like to be able to use a more compact notation: the Hexadecimal notation.</font></p>
+<p><font face="Trebuchet MS" size="2">Decimal notation we all know; we group numbers in units of
+10 and we have 10
+characters available for writing down values: 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9.
+If you understand the following calculations, you understand decimal notations:&nbsp;<br>
+<br>
+05 + 04 = 09<br>
+ 0<font color="#008000">9
++ 01 = 10.</font><br>
+<br>
+In the Hexadecimal system we have additional characters; A, B, C, D, E, F at
+our disposal for expressing values. If you understand the following
+calculations, you understand
+hexadecimal notations:&nbsp; <font color="#008080"><br>
+<br>
+09 + 06 = 0F<br>
+0</font><font color="#008000">F +
+01 = 10.</font><br>
+<br>
+We've already seen that by using 8 bits we can define 256 different states, so we
+should be able to express different combinations of zeros and ones in decimal or
+hexadecimal numbers. We will not explain how you can convert binary number to
+decimals or hexadecimals, it is only important that you understand that it can
+be done. If you can understand the following table however, you get the basic idea.
+If you need to convert binary to hex, hex to decimals etc. use
+either the Windows calculator or the simple calculator built in to the ByteBack D.R.I.S.<font size="1"><sup>TM</sup></font>
+editor.</font></p>
+<div align="center">
+  <table border="1" cellspacing="0" width="50%">
+    <tbody><tr>
+      <td width="33%"><font face="Trebuchet MS" size="2">Binary</font></td>
+      <td width="33%"><font face="Trebuchet MS" size="2">Hexadecimal</font></td>
+      <td width="34%"><font face="Trebuchet MS" size="2">Decimal</font></td>
+    </tr>
+    <tr>
+      <td width="33%"><font face="Trebuchet MS" size="2">00000000</font></td>
+      <td width="33%"><font face="Trebuchet MS" size="2">0</font></td>
+      <td width="34%"><font face="Trebuchet MS" size="2">0</font></td>
+    </tr>
+    <tr>
+      <td width="33%"><font face="Trebuchet MS" size="2">11111111</font></td>
+
+
+      <td width="33%"><font face="Trebuchet MS" size="2">FF</font></td>
+      <td width="34%"><font face="Trebuchet MS" size="2">255</font></td>
+    </tr>
+  </tbody></table>
+</div>
+<p><font face="Trebuchet MS" size="2">If you do not understand this table, then either don't worry about it, or do
+some 'Googling' to find more information on the subject.</font></p>
+<p><font face="Trebuchet MS" size="2">Note: the most common way to denote a
+value as Hex is : 0xA1B1, where 0x defines the value A1B1 as being noted in Hex.
+Another well-known notation is 02h, where h denotes the value as 02 in Hex.
+Throughout this chapter both notations are used.</font></p>
+<p><font face="Trebuchet MS" size="2">
+Certain standards and agreements exist about what a particular order of bytes
+represents. For example the ASCII standard allows us to represent characters
+in our alphabet by a specific sequences of bits. When software reads information
+from the hard disk, it therefore needs to know if it should interpret a given
+sequence of bytes as values to be used in calculations, or as ASCII
+characters (a text string).</font></p>
+<p><font face="Trebuchet MS" size="2">
+In the end, all information on your hard disk can be displayed as an apparent
+chaos: Your MP3 files, your drawings, in the end it's noting else but a bunch
+of zeros and ones.</font></p>
+<p><font face="Trebuchet MS" size="2">
+<b><u>Sectors</u></b></font></p>
+<p><font face="Trebuchet MS" size="2">A hard disk is capable of storing billions of bytes, so to address an
+individual byte (to know where something is stored), huge numbers would be required. To simplify addressing and
+finding information on a hard disk, bytes are grouped into units called '<b>sectors</b>'.
+A sector is a group of 512 Bytes. We start counting sectors from zero, so in
+order to
+read what's in the 513th byte on a disk, we would need to address sector 1. Even
+if we're only interested in the value of one particular byte, we need to read an
+entire sector into memory. A sector is the smallest addressable unit on a disk (you can read more than one sector at the time,
+but you can't read less than one sector).</font></p>
+<p><font face="Trebuchet MS" size="2">
+As mentioned before, a byte may represent a value, or for example an ASCII
+character. In the ByteBack D.R.I.S.<font size="1"><sup>TM</sup></font> <a href="http://www.toolsthatwork.com/bbdocs/editor.htm"> disk editor</a> main window three columns are shown.
+The first column shows the sequencenumber of the bytes in the sector (also known
+as the offset), the second
+column displays the values (in hexadecimal notation) of the individual bytes,
+and in the 3rd column this same information is shown, however now interpreted by
+using the ASCII table.</font></p>
+<p><font face="Trebuchet MS" size="2">All the information on a harddisk is
+organized in some way, which is defined by one (or more) of hundreds of protocols,
+specifications, conventions or standards that different organizations or
+software and operating system manufacturers have come up with over the years.
+And much of the information isn't defined by any of those and may only have
+meaning to specific software or operating systems, for example executable code
+or proprietary file formats.</font></p>
+<p><font face="Trebuchet MS" size="2">
+There is one important convention you need to be aware of when editing raw
+sectors; Intel Byte ordering (little endian): whenever a value exceeds 255 (and
+thus more than one byte is required to store the value), bytes are stored in reverse
+order! So if we would need to store a decimal number &gt; 255, we'd first
+convert it to hex, and then write the bytes to the disk in reverse order. So the
+decimal value of 41393, which equals A1B1 in hex is written to the disk as B1A1 (which is
+how the bytes will appear in a disk editor as well).<br>
+Please note that IntelByte ordering is not used all the time, it is used in some
+cases, for example in conjunction with partition table data. For instance, some
+sections of the MBR are written according to IntelByte order.</font></p>
+<p><font face="Trebuchet MS" size="2">
+<b><u>Addressing Sectors<a name="sectoraddressing"></a></u></b></font></p>
+      
+<p align="center"><font size="2"><img src="diskstructures_files/platters.gif" border="0" height="362" width="400"></font></p>
+<p align="left"><font face="Trebuchet MS" size="2">
+
+A long time ago, in a galaxy far, far away, sectors were addressed using the
+cylinder-head-sector notation, or 'CHS addressing' for short. This manual will not get into details, but try to visualize
+a hard disk being several platters on a spindle. Disk read/write heads float
+above the platter surface, one above and one below each platter. The individual
+platters are divided into tracks and the tracks are divided into sectors. The outer tracks
+form one cylinder, all next tracks form the next cylinder etc.. By describing a
+specific cylinder, head and sector, one specific sector can be addressed.</font></p>
+<p align="center"><font size="2"><img src="diskstructures_files/cylinders.gif" border="0" height="288" width="400"></font></p>
+<p align="left"><font size="2"><font face="Trebuchet MS">
+Modern operating systems and software no longer use CHS addressing. As a
+result of the limitations of several standards and&nbsp; specifications (the Int13h
+and IDE specifications) disks larger than approximately 8 Gb could not be addressed
+beyond the first 8 Gb. So when using CHS addressing on a 12 Gb hard disk, only the
+first 8 Gb could be addressed and used. Although CHS addressing is now obsolete, the partition table
+specification (see below) still reserves room for cylinder, head and sector
+values and partitions tend to start and end at cylinder boundaries.&nbsp;<br>
+<br>
+So, how do modern operating systems and other software address a sector? Quite
+simple, actually: basically they regard a disk as one huge line of sectors starting with the first
+sector (sector 0) up to the last sector on the disk. This is called Logical
+Block Addressing, or LBA.<br>
+<br>
+LBA addresses can be converted to CHS addresses and vice versa. In case you ever
+need to do so you can use the converter that is built into the ByteBack D.R.I.S.<font size="1"><sup>TM</sup></font> Disk
+Editor. Keep in mind that converting LBA to CHS is disk dependant: the CHS
+geometry of a disk defines where a cylinder stops and the next one starts. So
+the LBA address 126543 may translate into different CHS values for disks with
+different geometries.<br>
+<br>
+<font color="#ff0000"><b>Interesting fact:</b></font> ByteBack D.R.I.S.<font size="1"><sup>TM</sup></font> does not scan your
+entire disk when scanning for lost partitions. Partitions that were created using standard
+disk partitioning software (Fdisk, Windows Disk Management, PartitionMagic etc.) are
+'cylinder aligned': they typically start and end on a cylinder boundary. To locate lost
+partitions, ByteBack D.R.I.S.<font size="1"><sup>TM</sup></font> uses this knowledge to reduce the number of sectors that
+need to be scanned, in order to reduce the time needed. This results in a
+significantly faster diskscan.</font></font></p>
+<p align="left"><font face="Trebuchet MS" size="2">
+For ByteBack D.R.I.S.<font size="1"><sup>TM</sup></font> to be able to calculate the cylinder boundaries, it needs the
+correct disk geometry (heads per cylinder and sectors per track) information. ByteBack D.R.I.S.<font size="1"><sup>TM</sup></font> requires the disk to be configured (in the BIOS) using the
+same
+geometry information that was used at the time the disk was partitioned.</font></p>
+<p align="left"><font face="Trebuchet MS" size="2">
+If the geometry settings can not be adjusted by using the BIOS you need to make ByteBack D.R.I.S.<font size="1"><sup>TM</sup></font> aware of
+the disk geometry, as it was at the time that the partitions were created.</font></p>
+<p align="left"><font size="2"><font face="Trebuchet MS">
+<b><u>Specifications</u></b><br>
+<br>
+<b>#</b> <b>Partition Table Specification<br>
+<br>
+</b></font><span lang="EN-GB"><font face="Trebuchet MS"><span style="">The
+      partition table is a 64-byte data structure that is used to identify the type and
+      location of partitions on the hard disk drive. The partition table format
+is not related to any Operating System, it's completely independant. Each partition table entry is
+16 bytes long, so there is a maximum
+      of four entries.<span style="">&nbsp;
+      </span>Each entry starts at a predetermined offset relative to the start of
+      the sector (we count zero-based, the first byte in a sector is at address
+0) :</span></font></span></font></p>
+      <p align="left"><span style="" lang="EN-GB"><font face="Courier New" size="2">Entry
+      1, starts at offset 446 (01BE in Hex)<br>
+      Entry 2, starts at offset 462 (01CE in Hex)<br>
+      Entry 3, starts at offset 478 (01DE in Hex)<br>
+      Entry 4, starts at offset 494 (01EE in Hex)</font></span></p>
+      <p class="MsoBodyText2" align="left"><font size="2"><font face="Trebuchet MS"><span style="" lang="EN-GB">Note:
+      in Windows 2000/2003/XP only basic disks make use of the partition table.<span style="">
+      </span>Dynamic disks use the LDM database (located at the end of the disk)
+      for disk configuration information;<span style="">
+      t</span>he partition table is not updated when volumes are deleted or
+      extended after a dynamic disk upgrade, or when new dynamic volumes are
+      created.</span></font><span lang="EN-GB">&nbsp;<font face="Trebuchet MS">On
+      a dynamic disk only the first entry of the 'legacy' partition table is
+      used: it describes a type 42 partition occupying the entire disk (the
+      entire disk minus 1 cylinder to be exact).</font></span></font></p>
+      <p class="MsoBodyText2" align="left"><font face="Trebuchet MS" size="2"><span lang="EN-GB">One
+      Partition Table entry (the first of the four) up close and personal :</span></font><font size="2"><span lang="EN-GB"><o:p></o:p>
+      </span></font></p>
+      <div align="center">
+        <center>
+        <table border="1" cellpadding="0" cellspacing="0" height="164" width="95%">
+          <tbody><tr>
+            <td colspan="3" align="center" bgcolor="#0000ff" height="13" width="100%"><b><font color="#ffff00" size="2">Partition
+              Table Entry</font></b></td>
+          </tr>
+          <tr>
+            <td height="19" width="12%"><font face="Arial" size="2"><b>offset (dec)</b></font></td>
+            <td height="19" width="13%"><font face="Arial" size="2"><b>length</b></font></td>
+            <td height="19" width="75%"><font face="Arial" size="2"><b>Description</b></font></td>
+          </tr>
+          <tr>
+            <td height="14" width="12%"><font face="Arial" size="2">446</font></td>
+            <td height="14" width="13%"><font face="Arial" size="2">byte</font></td>
+            <td height="14" width="75%"><span lang="EN-GB"><font face="Arial" size="2">Boot
+              indicator byte (80h = active, otherwise 00h)</font></span></td>
+          </tr>
+          <tr>
+            <td height="14" width="12%"><font face="Arial" size="2">447</font></td>
+            <td height="14" width="13%"><font face="Arial" size="2">byte</font></td>
+            <td height="14" width="75%"><span lang="EN-GB"><font face="Arial" size="2">Starting
+              head (or side) of partition</font></span></td>
+          </tr>
+          <tr>
+            <td height="14" width="12%"><font face="Arial" size="2">448</font></td>
+            <td height="14" width="13%"><font face="Arial" size="2">16 bits</font></td>
+            <td height="14" width="75%"><span lang="EN-GB"><font face="Arial" size="2">Starting
+              cylinder (10 bits) and sector (6 bits)</font></span></td>
+          </tr>
+          <tr>
+            <td height="14" width="12%"><font face="Arial" size="2">450</font></td>
+            <td height="14" width="13%"><font face="Arial" size="2">byte</font></td>
+            <td height="14" width="75%"><span lang="EN-GB"><font face="Arial" size="2">System
+              indicator byte (see “Standard System Indicator Byte Values”
+              table)</font></span></td>
+          </tr>
+          <tr>
+            <td height="14" width="12%"><font face="Arial" size="2">451</font></td>
+            <td height="14" width="13%"><font face="Arial" size="2">byte</font></td>
+            <td height="14" width="75%"><span lang="EN-GB"><font face="Arial" size="2">Ending
+              head (or side) of partition</font></span></td>
+          </tr>
+          <tr>
+            <td height="14" width="12%"><font face="Arial" size="2">452</font></td>
+            <td height="14" width="13%"><font face="Arial" size="2">16 bits</font></td>
+            <td height="14" width="75%"><span lang="EN-GB"><font face="Arial" size="2">Ending
+              head (or side) of partition</font></span></td>
+          </tr>
+          <tr>
+            <td height="14" width="12%"><font face="Arial" size="2">454</font></td>
+            <td height="14" width="13%"><font face="Arial" size="2">DWORD</font></td>
+            <td height="14" width="75%"><span lang="EN-GB"><font face="Arial" size="2">Relative
+              sector offset of partition (start of partition), noted in sectors</font></span></td>
+          </tr>
+          <tr>
+            <td height="14" width="12%"><font face="Arial" size="2">458</font></td>
+            <td height="14" width="13%"><font face="Arial" size="2">DWORD</font></td>
+            <td height="14" width="75%"><span lang="EN-GB"><font face="Arial" size="2">Total
+              number of sectors in partition</font></span></td>
+          </tr>
+        </tbody></table>
+        </center>
+      </div>
+      <p class="MsoBodyText2"><font face="Trebuchet MS" size="2"><span style="" lang="EN-GB">The
+      example below is taken from a MBR. The entire underlined area (64 bytes
+      in size) is reserved for defining partitions. Each partition table sector
+      ends with a <b><font color="#ff00ff">55 AA</font></b> signature! If this
+      signature is missing, the operating system or disk partitioning tools will
+      regard the partition table to be absent.</span></font></p>
+      <div align="center">
+        <center>
+        <table border="1" cellspacing="0" width="95%">
+          <tbody><tr>
+            <td bgcolor="#0000ff" width="100%">
+              <p align="center"><b><span style=""><font color="#ffff00" size="2">A
+              MBR Partition Table</font></span></b></p></td>
+          </tr>
+          <tr>
+            <td width="100%">
+              <p style="text-align: center;" align="center"><span style="" lang="EN-GB"><font face="Courier New" size="1"><span style="color: navy;">432<span style="font-family: Courier New;">&nbsp;&nbsp;
+              </span>00 00 00 00 00 00 00 00 00 00 00 00 00 00 </span><b style=""><u><span style="color: red; font-family: Courier New;">80</span><span style="color: navy; font-family: Courier New;">
+              01</span></u><span style="color: navy; font-family: Courier New;">&nbsp;
+              ³<span style="font-family: Courier New;">&nbsp;
+              </span>..............€.<u><br>
+              </u>448<span style="font-family: Courier New;">&nbsp;&nbsp;
+              </span><u>01 00 </u></span><u><span style="font-family: Courier New;"><font color="#0000ff">0B</font></span><span style="color: navy; font-family: Courier New;">
+              FE BF 7C 3F 00 00 00 FE 25 9C 00 </span><span style="font-family: Courier New;"><font color="#ff0000">00</font></span><span style="color: navy; font-family: Courier New;">
+              00</span></u><span style="color: navy; font-family: Courier New;"><span style="font-family: Courier New;">&nbsp;
+              </span>³<span style="font-family: Courier New;">&nbsp;
+              </span>...þ¿|?...þ%œ...<u><br>
+              </u>464<span style="font-family: Courier New;">&nbsp;&nbsp;
+              </span><u>81 7D </u></span><u><span style="font-family: Courier New;"><font color="#0000ff">0F</font></span><span style="color: navy; font-family: Courier New;">
+              FE FF FF </span><span style="color: green; font-family: Courier New;">3D
+              26 9C 00</span><span style="color: navy; font-family: Courier New;">
+              43 03 B8 01 </span><span style="font-family: Courier New;"><font color="#ff0000">00</font></span><span style="color: navy; font-family: Courier New;">
+              00</span></u><span style="color: navy; font-family: Courier New;"><span style="font-family: Courier New;">&nbsp;
+              </span>³<span style="font-family: Courier New;">&nbsp;
+              </span>}.þÿÿ=&amp;œ.C.¸...<u><br>
+              </u>480<span style="font-family: Courier New;">&nbsp;&nbsp;
+              </span><u>00 00 00 00 00 00 00 00 00 00 00 00 00 00 </u></span><u><span style="font-family: Courier New;"><font color="#ff0000">00</font></span><span style="color: navy; font-family: Courier New;">
+              00</span></u><span style="color: navy; font-family: Courier New;">&nbsp;
+              ³<span style="font-family: Courier New;">&nbsp;
+
+
+              </span>................<u><br>
+              </u>496<span style="font-family: Courier New;">&nbsp;&nbsp;
+              </span><u>00 00 00 00 00 00 00 00 00 00 00 00 00 00</u> </span><span style="font-family: Courier New;"><font color="#ff00ff">55
+              AA</font></span></b><span style="color: purple; font-family: Courier New;">&nbsp;
+              </span><span style="color: navy;">³<span style="font-family: Courier New;">&nbsp;
+              </span>..............Uª</span></font></span></p></td>
+          </tr>
+        </tbody></table>
+        </center>
+      </div>
+      <p class="MsoBodyText2"><font face="Trebuchet MS" size="2"><span style="" lang="EN-GB"><o:p>"<font color="#ff0000"><b>80</b></font>"
+      determines that a partition is the active partition. The red column
+      indicates where '80' can be expected for all partition table entries.
+      However only one partition can be active at a time!</o:p></span></font></p>
+      <p class="MsoBodyText2"><font face="Trebuchet MS" size="2"><span style="" lang="EN-GB">
+      The 'blue' bytes (in the example "<b><font color="#0000ff">0B</font></b>"
+      and "<b><font color="#0000ff">0F</font></b>") describe the
+
+
+      partition types, in this example a FAT32 partition (0B) and an extended
+      partition (0F). Only one extended partition can be defined in the MBR. An extended
+      partition allocates an area in which logical partitions are located. The
+      first sector of the extended partition contains a partition table that
+      defines the first logical partition (in entry 1) and, if multiple logical
+      partitions are present, a pointer to the next partition table (in entry 2).
+      This first sector of the extended partition is called the EPBR (Extended
+      Partition Boot Record).<br>
+      The MBR can contain 4 partition table entries. The EPBR can also contain 4
+      partition table entries, but only the first 2 are used! Entries 3 and 4
+      are ignored, and thus usually empty.</span></font></p>
+      <div align="center">
+        <center>
+        <table border="1" cellspacing="0" height="15" width="95%">
+          <tbody><tr>
+            <td bgcolor="#0000ff" height="19" width="100%">
+              <p align="center"><b><font color="#ffff00" size="2">An extended
+              partition table sector</font></b></p></td>
+          </tr>
+          <tr>
+            <td align="center" height="1" width="100%">
+              <p style="text-align: center;" align="center"><font face="Courier New" size="1"><span style=""><span style="" lang="EN-GB">432<span style="">&nbsp;&nbsp;
+              </span>00 00 00 00 00 00 00 00 00 00 00 00 00 00 <b style=""><u>00
+              01</u><span style="">&nbsp;
+              </span>³<span style="">&nbsp;
+              </span>................<span style="color: navy; font-family: Courier New;" lang="EN-GB"><br>
+              </span></b></span><b style=""><span style="" lang="EN-GB"><span style="color: navy; font-family: Courier New;" lang="EN-GB">448<span style="">&nbsp;&nbsp;
+              </span><u><span>81 7D</span></u></span><span style="font-family: Courier New;" lang="EN-GB"><span><u>
+              <font color="#0000ff">0B</font> </u></span><span style="color: navy;"><u><span>FE
+              FF FF 3F 00 00 00 27 26 72 01 00 00</span></u><span style="">&nbsp;
+              </span>³<span style="">&nbsp;
+              </span>}.þÿÿ?...'&amp;r...</span></span><span style="color: navy; font-family: Courier New;" lang="EN-GB"><br>
+              464<span style="">&nbsp;&nbsp;
+              </span><u><span>C1 FF </span></u></span><span style="font-family: Courier New;" lang="EN-GB"><span><u><font color="#0000ff">05</font>
+              </u></span><span style="color: navy;"><u><span>FE
+              FF FF 66 26 72 01 04 BC 3F 00</span></u> 00 00<span style="">&nbsp;
+              </span>³<span style="">&nbsp;
+              </span>Áÿ.þÿÿf&amp;r..¼?...</span></span><span style="color: navy; font-family: Courier New;" lang="EN-GB"><br>
+              480<span style="">&nbsp;&nbsp;
+              </span>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00<span style="">&nbsp;
+              </span>³<span style="">&nbsp;
+              </span>................</span><span style="color: navy; font-family: Courier New;" lang="EN-GB"><br>
+              496<span style="">&nbsp;&nbsp;
+              </span>00 00 00 00 00 00 00 00 00 00 00 00 00 00 </span><span style="font-family: Courier New;" lang="EN-GB"><font color="#ff00ff">55
+              AA</font></span><span style="color: purple; font-family: Courier New;" lang="EN-GB">&nbsp;
+              </span></span></b><span style="" lang="EN-GB"><span style="color: navy; font-family: Courier New;" lang="EN-GB">³<span style="">&nbsp;
+              </span>..............</span><span style="color: purple;">Uª</span></span></span></font></p></td>
+          </tr>
+        </tbody></table>
+        </center>
+      </div>
+      <p class="MsoNormal" style="" align="left"><font face="Trebuchet MS" size="2">In
+      the first entry a "<b><font color="#0000ff">0B</font></b>" type partition is defined. The LBA
+      Relative offset is relative to the partition table it is defined in. The
+      "<b><font color="#0000ff">05</font></b>" type entry is the pointer to the next partition table, the
+      LBA offset is relative to the start of the extended partition.
+      Like all partition table sectors, the last 2 bytes of the sector contain
+      the <b><font color="#ff00ff">55 AA</font></b> signature.<br>
+      <br>
+      Below you can find an example disk layout:</font></p>
+      <center>
+<div align="center">
+  <table border="0" cellpadding="0" cellspacing="0" height="1" width="95%">
+    <tbody><tr>
+      <td bgcolor="#ff9900" height="19" width="3%"><font face="Trebuchet MS" size="2"><b>1</b>(1)</font></td>
+      <td bgcolor="#acdddc" height="19" width="19%"><font size="2"><b><font face="Trebuchet MS">FAT32</font></b><font face="Trebuchet MS" size="1">(1)</font></font></td>
+      <td bgcolor="#ff00ff" height="19" width="21%"><font face="Trebuchet MS" size="2"><b>NTFS</b>(1)</font></td>
+      <td bgcolor="#ff9900" height="19" width="3%"><font face="Trebuchet MS" size="2"><b>2</b>(1)</font></td>
+      <td bgcolor="#ff00ff" height="19" width="10%"><font face="Trebuchet MS" size="2"><b>NTFS</b>(2)</font></td>
+      <td bgcolor="#ff9900" height="19" width="3%"><font face="Trebuchet MS" size="2"><b>3</b>(2)</font></td>
+      <td bgcolor="#acdddc" height="19" width="20%"><font size="2"><b><font face="Trebuchet MS">FAT32</font></b><font face="Trebuchet MS" size="1">(3)</font></font></td>
+      <td bgcolor="#ff9900" height="19" width="3%"><font face="Trebuchet MS" size="2"><b>4</b>(3)</font></td>
+
+      <td bgcolor="#00ff00" height="19" width="19%"><font face="Trebuchet MS" size="2"><b>FAT</b>(4)</font></td>
+    </tr>
+    <tr>
+      <td colspan="3" bgcolor="#ffffff" height="1" width="43%"><font face="Trebuchet MS" size="1">primary</font></td>
+      <td colspan="6" bgcolor="#0099cc" height="1" width="58%"><font face="Trebuchet MS" size="1">extended</font></td>
+    </tr>
+  </tbody></table>
+</div>
+      </center>
+      <p align="left"><font size="1">Legend:&nbsp;<font face="Courier New"><span style="background-color: rgb(255, 153, 51);">&nbsp;&nbsp;</span></font><font face="Trebuchet MS">
+      = Partition Table sector (the MBR or EPBR) /&nbsp;</font><font face="Courier New"><span style="background-color: rgb(0, 153, 204);">&nbsp;&nbsp;</span></font><font face="Trebuchet MS">
+      = the extended region that contains the logical partitions.<br>
+      </font></font><font face="Trebuchet MS" size="1">The values that are
+      between parenthesis point to the partition table sector (</font><font face="Courier New" size="1"><span style="background-color: rgb(255, 153, 51);">&nbsp;
+      </span></font><font face="Trebuchet MS" size="1">) in which the partition
+      table structures for that partition can be found.</font>
+</p>
+      <p align="left"><font face="Trebuchet MS" size="2"><i>
+      Partition Table Sector&nbsp;</i></font><font face="Courier New" size="2"><span style="background-color: rgb(255, 153, 51);">
+      <b>1</b>&nbsp;</span></font><font face="Trebuchet MS" size="2"> describes:</font>
+</p>
+      <p align="left"><font face="Trebuchet MS" size="2">
+- <font color="#000000"> The primary <b> FAT32 partition&nbsp;</b><br>
+- The primary <b> NTFS partition</b><br>
+- The <b> Extended partition</b></font></font>
+</p>
+      <p align="left"> <font color="#000000"> <font face="Trebuchet MS" size="2">
+
+
+The first sector of the extended partition&nbsp;</font></font><font color="#000000" face="Courier New" size="2"><span style="background-color: rgb(255, 153, 0);">
+      <b>2</b>&nbsp;</span></font><font face="Trebuchet MS" size="2"><font color="#000000">
+      contains a <i> Partition Table Sector</i>. It defines:</font></font>
+</p>
+      <p align="left"><font color="#000000"><font face="Trebuchet MS" size="2">
+- The logical <b> NTFS partition</b><br>
+- The next <b> Partition Table Sector</b>&nbsp;</font></font><font color="#000000" face="Courier New" size="2"><span style="background-color: rgb(255, 153, 0);">
+      <b>3</b>&nbsp;</span></font>
+</p>
+      <p align="left"><font color="#000000"><font face="Trebuchet MS" size="2">
+      <i>
+Partition Table Sector</i>&nbsp;</font></font><font color="#000000" face="Courier New" size="2"><span style="background-color: rgb(255, 153, 0);">
+      <b>3</b>&nbsp;</span></font><font color="#000000" face="Trebuchet MS" size="2">
+      describes:</font>
+</p>
+      <p align="left"><font face="Trebuchet MS" size="2"><font color="#000000">
+- the logical <b> FAT32 partition</b></font> <br>
+- and the next <b> Partition Table Sector</b>&nbsp;</font><font face="Courier New" size="2"><span style="background-color: rgb(255, 153, 0);">
+      <b>4</b>&nbsp;</span></font>
+</p>
+      <p align="left"><font face="Trebuchet MS" size="2"><i>Partition Table
+      Sector</i>&nbsp;</font><font face="Courier New" size="2"><span style="background-color: rgb(255, 153, 0);">
+      <b>4</b>&nbsp;</span></font><font face="Trebuchet MS" size="2"> describes:</font>
+</p>
+      <p align="left"><font face="Trebuchet MS" size="2">- the logical <b>FAT
+      partition</b></font>
+</p>
+      <p align="left"><font face="Trebuchet MS" size="2">end there the chain
+
+      ends.</font>
+
+
+</p>
+      <p align="left"><font face="Trebuchet MS" size="2">
+Partition tables form a 'chain'. If the chain is broken at
+some point, all logical partitions defined later in the chain past the
+      'breakpoint' can not be accessed.<br>
+      A
+Partition Table Sector that points to the next Partition Table Sector should
+always point forward.<br>
+<br>
+<b>#</b> <b>Boot Sector Specification<br>
+<br>
+</b>The first sector(s) of an individual partition is the boot sector. Although
+the name boot sector suggests this sector has something to do with booting (which
+indeed can be the case as the boot sector may contain executable code for
+booting the operating system), it plays a more important role as the 'mother of
+      the filesystem structures'. The boot sector contains important information
+      about the partition's size, how it's built up and were the administrative
+      structures are. A damaged boot sector can lead to unexplainable access
+      problems and partitions becoming invisible. A common problem that can be
+      caused by a damaged boot sector is windows asking you 'do you want to
+      format this partition' when you know the partition was in perfect shape
+      during your previous session.<br>
+      In contrast to the partition table structures, a boot sector IS Operating
+      System dependant: boot sectors for FAT32 partitions are different from
+      boot sectors for NTFS partitions.</font>
+</p>
+      <p align="left"><font face="Trebuchet MS" size="2">
+<b>The boot sector in the FAT partition</b></font>
+</p>
+      <p align="left"><font face="Trebuchet MS" size="2">The general layout for a FAT partition is as follows:</font>
+</p>
+<div align="center">
+  <center>
+  <table border="0" cellpadding="0" cellspacing="0" width="80%">
+    <tbody><tr>
+      <td bgcolor="#808080" width="8%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">Boot</font></b></p>
+      </td>
+      <td bgcolor="#ff00ff" width="11%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">FAT 1</font></b></p>
+      </td>
+      <td bgcolor="#ff00ff" width="12%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">FAT 2</font></b></p>
+      </td>
+      <td bgcolor="#ffff00" width="10%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">Root</font></b></p>
+      </td>
+      <td bgcolor="#00ffff" width="59%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">Data</font></b></p>
+      </td>
+    </tr>
+  </tbody></table>
+  </center>
+</div>
+      <p><font face="Trebuchet MS" size="2">The central structure in the FAT
+      file system is the File Allocation Table (FAT). The FAT's position and size can
+      be determined from (are defined by) the boot sector. The data area is divided into
+      clusters. A cluster consists of one or more sectors. For each cluster an entry
+      is kept in the FAT. A cluster can be free, occupied or bad.</font></p>
+      <p><font face="Trebuchet MS" size="2">
+      The startlocation of a file or folder is defined in a directory entry. The
+      directory entry for a file/folder contains a filename, attributes (hidden,
+      archive etc.), the start cluster (<b><font color="#0099cc">n</font></b>)
+      and the size of the file.</font></p>
+      <p><font face="Trebuchet MS" size="2">
+      To access a file, cluster (<font color="#0099cc"><b>n</b></font>) will
+      be looked up in the FAT. If the file size &gt; 1 cluster, the value in the
+      FAT entry points to the next cluster that was allocated to this file.</font></p>
+      <p><font face="Trebuchet MS" size="2">
+      Locations of the FAT and the data area are described in the boot sector.
+      Values as they are described in the boot sector are relative to the start
+      of the partition. For example, the position of the first FAT can be
+      derived from the value for 'Reserved Sectors'. Then, once the sectors per
+      FAT and the number of FATs was determined, the start of the <u>Root</u>
+      area follows as: Reserved Sectors + 2*(Sectors Per FAT).</font></p>
+      <p><font face="Trebuchet MS" size="2">FAT Boot Sector layout:</font></p>
+      <p align="left"><b><font color="#0000ff" face="Trebuchet MS" size="2">The data contained in
+                the boot sector after the OEM name string is referred to as the
+                BIOS parameter block or BPB</font></b></p>
+      <div align="center">
+        <center>
+        <table bordercolorlight="#C0C0C0" bordercolordark="#FFFFFF" border="1" bordercolor="#cccccc" cellpadding="0" cellspacing="0" width="95%">
+          <tbody>
+            <tr>
+              <td width="40"><font face="Arial" size="2"><b>Offset</b></font></td>
+              <td width="40"><font face="Arial" size="2"><b>Length</b></font></td>
+              <td><font face="Arial" size="2"><b>Field</b></font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">00h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">3</font></td>
+
+              <td><font face="Arial" size="2">Machine code for jump over
+                the data.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">03h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">8</font></td>
+              <td><font face="Arial" size="2">OEM name string (of OS that
+                formatted the disk).</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">0Bh</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+              <td><font face="Arial" size="2">Bytes per sector, almost always 512 but can be 1024,2048 or 4096.</font></td>
+            </tr>
+
+
+            <tr>
+              <td width="40"><font face="Arial" size="2">0Dh</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+              <td><font face="Arial" size="2">Sectors per cluster, valid
+                numbers are: 1,2,4,8,16,32,64 and 128, but a cluster size larger
+                than 32K should not occur.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">0Eh</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+              <td><font face="Arial" size="2">Reserved sectors (number of
+                sectors before the first FAT including the boot sector), usually
+                1.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">10h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+              <td><font face="Arial" size="2">Number of FAT's (almost
+                always 2).</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">11h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+              <td><font face="Arial" size="2">Maximum number of root
+                directory entries.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">13h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+              <td><font face="Arial" size="2">Total number of sectors (for
+                small disks only, if the disk is too big this is set to 0 and
+                offset 20h is used instead).</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">15h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+              <td><font face="Arial" size="2">Media descriptor byte,
+                pretty much meaningless nowadays (see below).</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">16h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+              <td><font face="Arial" size="2">Sectors per FAT.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">18h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+              <td><font face="Arial" size="2">Sectors per track.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">1Ah</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+              <td><font face="Arial" size="2">Total number of heads/sides.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">1Ch</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">4</font></td>
+              <td><font face="Arial" size="2">Number of hidden sectors
+                (sectors preceding the boot sector).</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">20h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">4</font></td>
+              <td><font face="Arial" size="2">Total number of sectors for
+                large disks.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">24h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">26</font></td>
+              <td><font face="Arial" size="2">Either extended BPB (see
+                below) or machine code.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">3Eh</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">448</font></td>
+              <td><font face="Arial" size="2">Machine code.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">1FEh</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+              <td><font face="Arial" size="2">Boot Signature AA55h.</font></td>
+            </tr>
+          </tbody>
+        </table>
+        </center>
+      </div>
+      <p align="left"><b><font color="#0000ff" face="Trebuchet MS" size="2">The Extended BIOS
+                parameter block</font></b></p>
+      <div align="center">
+        <center>
+        <table bordercolorlight="#C0C0C0" bordercolordark="#FFFFFF" border="1" bordercolor="#cccccc" cellpadding="0" cellspacing="0" width="95%">
+          <tbody>
+            <tr>
+              <td width="40"><font face="Arial" size="2"><b>Offset</b></font></td>
+              <td width="40"><font face="Arial" size="2"><b>Length</b></font></td>
+
+
+              <td><font face="Arial" size="2"><b>Field</b></font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">24h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+              <td><font face="Arial" size="2">Physical drive number (using
+                the BIOS 80h is first HDD, 00h is first FDD).</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">25h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+              <td><font face="Arial" size="2">Current head (not used for
+                this but WinNT stores two flags here).</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">26h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+              <td><font face="Arial" size="2">Signature (must be 28h or
+                29h to be recognised by NT).</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">27h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">4</font></td>
+              <td><font face="Arial" size="2">The serial number. The
+                serial number is stored in reverse order and is the hex
+                representation of the bytes stored here.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">2Bh</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">11</font></td>
+              <td><font face="Arial" size="2">Volume label.</font></td>
+            </tr>
+            <tr>
+              <td width="40"><font face="Arial" size="2">36h</font></td>
+              <td align="left" width="40"><font face="Arial" size="2">8</font></td>
+              <td><font face="Arial" size="2">File system ID.
+                "FAT12", "FAT16" or "FAT&nbsp; ".</font></td>
+            </tr>
+          </tbody>
+        </table>
+        </center>
+      </div>
+<p align="left">
+<b><font face="Trebuchet MS" size="2">The boot sector in the FAT32 partition</font></b>
+</p>
+<div align="center">
+  <center>
+  <table border="0" cellpadding="0" cellspacing="0" width="80%">
+    <tbody><tr>
+      <td bgcolor="#808080" width="11%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">Boot</font></b></p>
+      </td>
+      <td bgcolor="#ff00ff" width="15%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">FAT 1</font></b></p>
+      </td>
+      <td bgcolor="#ff00ff" width="13%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">FAT 2</font></b></p>
+      </td>
+      <td bgcolor="#00ffff" width="61%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">Data</font></b></p>
+      </td>
+    </tr>
+  </tbody></table>
+  </center>
+</div>
+      <p><font face="Trebuchet MS" size="2">The central structure in the FAT32
+      file system is the File Allocation Table (FAT). The FAT's position and size can
+      be determined from (are defined by) the boot sector. The data area is divided into
+      clusters. A cluster consists of one or more sectors. For each cluster an entry
+      is kept in the FAT. A cluster can be free, occupied or bad. A FAT entry in
+      the FAT32 file system allows for 32 bits (although currently only 28 bits
+      are used).</font></p>
+      <p><font face="Trebuchet MS" size="2">
+      The startlocation of a file or folder is defined in a directory entry. The
+      directory entry for a file/folder contains a filename, attributes (hidden,
+      archive etc.), the start cluster (<b><font color="#0099cc">n</font></b>)
+      and the size of the file.</font></p>
+      <p><font face="Trebuchet MS" size="2">
+      To access a file, cluster (<font color="#0099cc"><b>n</b></font>) will
+      be looked up in the FAT. If the file size &gt; 1 cluster, the value in the
+      FAT entry points to the next cluster that was allocated to this file.</font></p>
+      <p><font face="Trebuchet MS" size="2">
+      Locations of the FAT and the data area are described in the boot sector.
+      Values as they are described in the boot sector are relative to the start
+      of the partition. For example, the position of the first FAT can be
+      derived from the value for 'Reserved Sectors'. Then, once the sectors per
+      FAT and the number of FATs was determined, the start of the <u>Data</u>
+      area follows as: Reserved Sectors + 2*(Sectors Per FAT).</font></p>
+      <p><font face="Trebuchet MS" size="2">FAT32 Boot Sector layout:</font></p>
+      <p align="left"><b><font color="#0000ff" face="Trebuchet MS" size="2">The data
+              contained in the boot sector after the OEM name string is referred
+              to as the BIOS parameter block or BPB</font></b></p>
+      <div align="center">
+        <center>
+      <table bordercolorlight="#C0C0C0" bordercolordark="#FFFFFF" border="1" bordercolor="#cccccc" cellpadding="0" cellspacing="0" width="95%">
+        <tbody>
+          <tr>
+            <td width="40"><font face="Arial" size="2"><b>Offset</b></font></td>
+            <td width="40"><font face="Arial" size="2"><b>Length</b></font></td>
+            <td><font face="Arial" size="2"><b>Field</b></font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">00h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">3&nbsp;</font></td>
+            <td><font face="Arial" size="2">Machine code for
+              jump over the data.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">03h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">8</font></td>
+            <td><font face="Arial" size="2">OEM name string
+              (of OS that formatted the disk).</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">0Bh</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+            <td><font face="Arial" size="2">Bytes per sector,
+              almost always 512 but can be 1024,2048 or 4096.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">0Dh</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+            <td><font face="Arial" size="2">Sectors per
+              cluster, valid numbers are: 1,2,4,8,16,32,64 and 128, but a cluster
+
+
+              size larger than 32K should not occur.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">0Eh</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+            <td><font face="Arial" size="2">Reserved sectors
+              (number of sectors before the first FAT including the boot
+              sector), usually 32.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">10h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+            <td><font face="Arial" size="2">Number of FAT's
+              (almost always 2).</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">11h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2&nbsp;</font></td>
+            <td><font face="Arial" size="2">Maximum number of
+              root directory entries.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">13h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+            <td><font face="Arial" size="2">0.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">15h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+            <td><font face="Arial" size="2">Media descriptor
+              byte, pretty much meaningless nowadays (see below).</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">16h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+            <td><font face="Arial" size="2">0.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">18h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+            <td><font face="Arial" size="2">Sectors per track.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">1Ah</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+            <td><font face="Arial" size="2">Total number of
+              heads/sides.</font></td>
+          </tr>
+          <tr>
+
+            <td width="40"><font face="Arial" size="2">1Ch</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">4</font></td>
+            <td><font face="Arial" size="2">Number of hidden
+              sectors (sectors preceding the boot sector).</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">20h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">4</font></td>
+            <td><font face="Arial" size="2">Total number of
+              sectors.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">24h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">4</font></td>
+            <td><font face="Arial" size="2">FAT32 sectors per
+              FAT.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">28h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+
+
+            <td><font face="Arial" size="2">If bit 7 is clear
+              then all FAT's are updated (active) otherwise bits 0-3 point to the current
+              active FAT, all other bits are reserved.</font></td>
+          </tr>
+
+
+          <tr>
+            <td width="40"><font face="Arial" size="2">2Ah</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+            <td><font face="Arial" size="2">High byte is major
+              revision number, low byte is minor revision number, currently both
+              are 0.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">2Ch</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">4</font></td>
+            <td><font face="Arial" size="2">Root directory
+              starting cluster.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">30h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+            <td><font face="Arial" size="2">File system
+              information sector.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">32h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+            <td><font face="Arial" size="2">If non-zero this
+              gives the sector which holds a copy of the boot record, usually 6.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">34h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">12</font></td>
+            <td><font face="Arial" size="2">Reserved, set to
+              0.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">40h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+            <td><font face="Arial" size="2">Physical drive
+              number (using the BIOS 80h is first HDD, 00h is first FDD)</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">41h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+            <td><font face="Arial" size="2">Reserved.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">42h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">1</font></td>
+
+
+            <td><font face="Arial" size="2">Signature (must be
+              28h or 29h to be recognised by NT).</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">43h</font></td>
+
+
+            <td align="left" width="40"><font face="Arial" size="2">4</font></td>
+            <td><font face="Arial" size="2">The serial number,
+              the serial number is stored in reverse order and is the hex
+              representation of the bytes stored here.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">47h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">11</font></td>
+            <td><font face="Arial" size="2">Volume label.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">52h</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">8</font></td>
+            <td><font face="Arial" size="2">File system ID
+              "FAT32 ".</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">5Ah</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">8</font></td>
+            <td><font face="Arial" size="2">Machine code.</font></td>
+          </tr>
+          <tr>
+            <td width="40"><font face="Arial" size="2">1FEh</font></td>
+            <td align="left" width="40"><font face="Arial" size="2">2</font></td>
+            <td><font face="Arial" size="2">Boot Signature
+              AA55h.</font></td>
+          </tr>
+        </tbody>
+      </table>
+        </center>
+      </div>
+<p align="left"><font face="Trebuchet MS" size="2"><b>The boot sector in the NTFS
+partition</b>
+</font>
+</p>
+<div align="center">
+  <center>
+  <table border="0" cellpadding="0" cellspacing="0" width="80%">
+    <tbody><tr>
+      <td bgcolor="#808080" width="11%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">Boot</font></b></p>
+      </td>
+      <td bgcolor="#00ffff" width="28%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">Data</font></b></p>
+      </td>
+      <td bgcolor="#ff00ff" width="10%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">$MFT</font></b></p>
+      </td>
+      <td bgcolor="#00ffff" width="51%">
+        <p align="left"><b><font face="Trebuchet MS" size="2">Data</font></b></p>
+      </td>
+    </tr>
+  </tbody></table>
+  </center>
+
+</div>
+      <p align="left"><font face="Trebuchet MS" size="2">The central
+      administrative structure in NTFS is the Master File Table (MFT). The NTFS
+      partition is divided into clusters (the entire partition!) and clusters
+      consist of one or more sectors. Cluster sizes can be read from the boot
+      sector. Everything in the NTFS file system is a file, even for example the
+      boot sector ($Boot).
+      </font>
+      </p><p align="left"><font face="Trebuchet MS" size="2">
+      All files are described in the MFT, even the the '$MFT' itself. One or
+      more MFT entries or File record Segments can be assigned to a file. An MFT entry typically
+      describes the filename and the clusters assigned to the file. Assigned
+      clusters are defined in so called 'run-lists': rather than describing each
+      cluster individually, a start cluster value and a number of clusters value
+      is described. For fragmented files multiple run lists are maintained.</font>
+      </p><p align="left"><font face="Trebuchet MS" size="2">NTFS Boot Sector
+      layout:<br>
+      <br>
+      </font>
+      </p><div align="center">
+        <center>
+          </center><table bordercolorlight="#C0C0C0" bordercolordark="#FFFFFF" border="1" bordercolor="#cccccc" cellpadding="0" cellspacing="0" width="95%">
+        <tbody><tr>
+            <td height="16" width="40"><font face="Arial" size="2"><b>Offset</b></font></td>
+            <td height="16" width="40"><font face="Arial" size="2"><b>Length</b></font></td>
+            <td height="16"><font face="Arial" size="2"><b>Field
+        Name</b></font></td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">0Bh</font></td>
+            <td height="16" width="40"><font face="Arial" size="2">2</font></td>
+            <td height="16"><font face="Arial" size="2">Bytes Per Sector</font></td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">0Dh</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">1</font></p>
+            </td>
+            <td height="16">
+              <p><font face="Arial" size="2">Sectors Per Cluster</font></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">0Eh</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">2</font></p>
+            </td>
+            <td height="16">
+              <p><font face="Arial" size="2">Reserved Sectors</font></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="20" width="40"><font face="Arial" size="2">10h</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">3 </font></p>
+            </td>
+            <td height="16">
+              <p><i><font face="Arial" size="2">always 0</font></i></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">13h</font></td>
+            <td height="13" width="40">
+              <p><font face="Arial" size="2">2</font></p>
+            </td>
+            <td height="13">
+              <p><i><font face="Arial" size="2">not used by NTFS</font></i></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">15h</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">1&nbsp;</font></p>
+            </td>
+            <td height="16">
+              <p><font face="Arial" size="2">Media Descriptor</font></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">16h</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">2</font></p>
+            </td>
+            <td height="16">
+              <p><i><font face="Arial" size="2">always 0</font></i></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">18h</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">2</font></p>
+            </td>
+            <td height="16">
+              <p><font face="Arial" size="2">Sectors Per Track</font></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">1Ah</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">2</font></p>
+            </td>
+            <td height="16">
+              <p><font face="Arial" size="2">Number Of Heads</font></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">1Ch</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">4</font></p>
+            </td>
+            <td height="16">
+              <p><font face="Arial" size="2">Hidden Sectors</font></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">20h</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">4</font></p>
+            </td>
+            <td height="16">
+              <p><i><font face="Arial" size="2">not used by NTFS</font></i></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">24h</font></td>
+            <td height="16" width="40">
+
+
+              <p><font face="Arial" size="2">4</font></p>
+            </td>
+            <td height="16">
+              <p><i><font face="Arial" size="2">not used by NTFS</font></i></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">28h</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">8</font></p>
+            </td>
+            <td height="16">
+              <p><font face="Arial" size="2">Total Sectors</font></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">30h</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">8</font></p>
+            </td>
+            <td height="16">
+              <p><font face="Arial" size="2">Logical Cluster Number for the file
+              $MFT</font></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">38h</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">8&nbsp;&nbsp;</font></p>
+            </td>
+            <td height="16">
+
+              <p><font face="Arial" size="2">Logical Cluster Number for the file
+              $MFTMirr</font></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">40h</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">4</font></p>
+            </td>
+            <td height="16">
+              <p><font face="Arial" size="2">Clusters Per File Record Segment</font></p>
+            </td>
+
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">44h</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">4</font></p>
+            </td>
+            <td height="16">
+              <p><font face="Arial" size="2">Clusters Per Index Block</font></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="19" width="40"><font face="Arial" size="2">48h</font></td>
+            <td height="16" width="40">
+              <p><font face="Arial" size="2">8</font></p>
+            </td>
+            <td height="16">
+              <p><font face="Arial" size="2">Volume ID</font></p>
+            </td>
+          </tr>
+          <tr>
+            <td height="1" width="40"><font face="Arial" size="2">50h</font></td>
+            <td height="1" width="40">
+              <p><font face="Arial" size="2">4</font></p>
+            </td>
+            <td height="1">
+              <p><font face="Arial" size="2">Checksum</font></p>
+            </td>
+          </tr>
+        </tbody></table>
+        
+      </div>
+
+
+
+
+      </td>
+    </tr>
+  </tbody></table>
+</center></div>
+
+
+
+
+<p align="center"><a href="http://www.toolsthatwork.com/" target="_blank"><font size="1">http://www.toolsthatwork.com</font></a></p>
+
+
+
+
+</body></html>

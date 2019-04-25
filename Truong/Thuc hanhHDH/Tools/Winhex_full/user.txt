@@ -1,0 +1,8 @@
+// WinHex license file
+
+Name: "Dr.Thril"
+Addr1: "Team"
+Addr2: "ZWT"
+Key1: F7ED0C5A50EF193257684648544DFDE8
+Key2: F7DC3940609321C5B506C6D1F440A546
+Chksm: B0

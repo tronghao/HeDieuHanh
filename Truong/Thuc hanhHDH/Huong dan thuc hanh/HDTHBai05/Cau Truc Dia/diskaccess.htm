@@ -1,0 +1,162 @@
+<html><head>
+<meta name="GENERATOR" content="Microsoft FrontPage 3.0"><title>How to Read and Write to a Hard Drive</title></head>
+
+<body>
+
+<p align="center"><strong><u><big>How to Read and Write to a Hard Drive</big></u></strong><br>
+Written by Jack Dobiash</p>
+
+<p align="center"><em>Updated May 8th, 1999</em></p>
+
+<p align="left">&nbsp;</p>
+
+<p align="left"><em>&nbsp;&nbsp; </em>Since I've been getting several questions regarding
+how to access the data on a Hard Drive, I figured I'd write up this little starter. &nbsp;
+I don't plan on showing every detail, since each programming language has a different way
+to implement it, but it should at least point you in the right direction. &nbsp; Basically
+all these instructions pertain to using the Software Interrupts that are built into DOS
+v5.0 and above, including Windows '95 and '98 (Although I don't use any that require me to
+be inside of the GUI environment).&nbsp; Note that this may not be (and probably isn't)
+the only way to do this, but it is the method that I am using.&nbsp; If you have a
+different operating system than something Microsoft based, while the Interrupts may be
+different, the method to doing it is still probably similar.</p>
+
+<p align="left">&nbsp;</p>
+
+<p align="left"><u><strong>Int 13h Extensions</strong></u></p>
+
+<p align="left">&nbsp;&nbsp;&nbsp; Right off the bat I have to talk about the Int 13h
+Extensions.&nbsp; Basically Interrupt 13h is the one that I use for all of the disk
+accessing.&nbsp; The problem is that the original disk accessing commands of Int 13h don't
+have the capability of reaching beyond the 8GB barrier which some of you have probably
+heard of.&nbsp; The limit stems from the fact that they only allow a maximum of 1024
+cylinders, 256 heads, and 63 sectors per track, which if you multiply those all together
+and then by 512 (number of bytes in each sector), you get the 8GB (Actually it's a tad
+below 8GB, but pretty darn close).&nbsp; Anyway, newer computers have BIOS's that have Int
+13h Extensions in them, which are new routines that can reach beyond the barrier. &nbsp;
+Older computers which don't have this addition can have a Disk Overlay Manager (like
+OnTrack or EZ-Drive) load up right at the start which will add in routines and make the
+whole drive accessible.&nbsp; There were also other barriers too (the 504MB limit, the
+2048MB limit) but those were for other reasons.</p>
+
+<p align="left">&nbsp;&nbsp;&nbsp; Basically the first thing you want to do is check to
+see if the computer has the capability to use the Int 13h Extensions.&nbsp; If it does,
+you can then just use those routines from that point on, otherwise you'll need to use the
+older ones.&nbsp; The Interrupt to check for the extensions is <u><em><strong>Int 13h,
+section AH=41h</strong></em></u>.&nbsp; If the Carry Flag is NOT set, then the computer
+has the extensions.</p>
+
+<p align="left">&nbsp;&nbsp;&nbsp; Note: Here is a <a href="http://www.teleport.com/%7Ebrainy/interrupts.htm">link</a> to all of the interrupts
+I'm going to talk about on this page, with information on what to plug into the Registers
+to make them work.&nbsp; Since talking about the details of how to use each interrupt
+would take to long, I'll just say which ones to use and you can refer to the <a href="http://www.teleport.com/%7Ebrainy/interrupts.htm">Interrupts Page</a> on how to use
+them.</p>
+
+<p align="left">&nbsp;&nbsp;&nbsp; So from now on I'll make two references on how to do
+things.&nbsp; One with the extensions, and one without.</p>
+
+<p align="left">&nbsp;</p>
+
+<p align="left"><u><strong>Drive Parameters</strong></u></p>
+
+<p align="left">&nbsp;&nbsp;&nbsp; First thing that needs to be done is to get the
+parameters of the drive (How many Cylinders, Head, Sectors, Total # of Sectors, etc).
+&nbsp;&nbsp; </p>
+
+<p align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Extensions Method : <em><u><strong>Use
+Int 13h, section AH=48h.</strong></u></em> <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Non-Extensions Method : <strong><em><u>Use Int
+13h, section AH=08h.</u></em></strong> </p>
+
+<p align="left">&nbsp;&nbsp;&nbsp; The Non-Extensions Method won't give you the Total # of
+Sectors in the drive, so if you need to know you'll have to calculate it.&nbsp; Also, the
+values you get from the Extensions Method are the TOTAL amount of them, so if it says you
+have 128 heads, it means you have to use 127 as the Max Value, since Heads and Cylinders
+are 0 based values.&nbsp; The number of sectors will be correct as is, since it is a 1
+based value.</p>
+
+<p align="left">&nbsp;</p>
+
+<p align="left"><u><strong>CHS &lt;--&gt; LBA Translations</strong></u></p>
+
+<p align="left">&nbsp;&nbsp;&nbsp; If you can use Extensions, than basically you won't
+need to use anything but LBA (Logical Block Addressing) Mode.&nbsp; In this mode you can
+just reference the drive sector by sector, with 0 being the MBR, and on up.&nbsp; No need
+to keep track of what Cylinder or Head or Sector you are on that way.&nbsp; If you can't
+use the extensions, then you'll need routines to convert an LBA value into a CHS value in
+order to use the reading and writing routines.&nbsp; It's still a good idea to reference
+everything in LBA, and to only use CHS when doing the actual reading and writing. &nbsp;
+For example, if I want to access the 16000th sector through the 17000th sector of a hard
+drive, instead of having to keep track of CHS values during the count, you just use LBA,
+and send that number to the read/write routine, which at that point the LBA gets turned
+into CHS to be used in the interrupt.&nbsp; It's must easier than having to keep track of
+incrementing H when S is full and incrementing C when H is full.</p>
+
+<p align="left">&nbsp;&nbsp;&nbsp; Anyway, onto the math.&nbsp; To Convert a CHS value to
+a LBA value, you use this math formula:</p>
+
+<p align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LBA =
+(Sector - 1) + (Head * Total Sectors) + (Cylinder * (Total&nbsp; Heads + 1) * Total
+Sectors)</p>
+
+<p align="left">Total Sectors and Total Heads were values obtained from the Drive
+Parameters.</p>
+
+<p align="left">&nbsp;&nbsp;&nbsp; To Convert an LBA value back to CHS, you use these math
+formulas:</p>
+
+<p align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sector
+&nbsp; = ((LBA <strong>Mod</strong> Total Sectors) +1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CylHead = (LBA <strong>Div</strong>
+Total Sectors)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Head = (CylHead <strong>Mod</strong>
+(Total Heads + 1))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cylinder = (CylHead <strong>Div</strong>
+(Total Heads + 1))</p>
+
+<blockquote>
+  <p align="left">Basically what you are seeing here is how I did it in Pascal without some
+  of the syntax.&nbsp; <strong>MOD</strong> is a way to obtain the remainder of the math,
+  instead of the quotient.&nbsp; You'll need to figure out what your languages equivalent
+  syntax is.&nbsp; Also, CYLHEAD is just a temporary variable I used to hold information
+  which was then used to figure out the # of Heads and Cylinders.</p>
+</blockquote>
+
+<p align="left">&nbsp;</p>
+
+<p align="left"><br>
+<u><strong>Reading and Writing to the Drive</strong></u></p>
+
+<p>&nbsp;&nbsp;&nbsp; <em>Reading Routines</em></p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Extensions Method : <em><u><strong>Use
+Int13h, section AH=42h</strong></u></em><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Non-Extensions Method : <u><em><strong>Use
+Int13h, section AH=02h</strong></em></u></p>
+
+<p>&nbsp;&nbsp;&nbsp; <em>Writing Routines</em></p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Extensions Method : <u><em><strong>Use
+Int13h, section AH=43h</strong></em></u><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Non-Extensions Method : <u><em><strong>Use
+Int13h, section AH=03h</strong></em></u></p>
+
+<p>&nbsp;</p>
+
+<p><strong><em><u>Editing the Drive</u></em></strong></p>
+
+<p>&nbsp;&nbsp;&nbsp; I've also gotten some questions regarding how to directly edit your
+drive.&nbsp; In response I've decided to release my own little <a href="http://www.teleport.com/%7Ebrainy/DDD14.ZIP">Disk Doctor</a> program.&nbsp; Basically
+it allows you to go through the sectors of your hard drive and make byte by byte changes.
+&nbsp; Of course this is a <u>USE AT YOUR OWN RISK</u> program, but I use it at work and
+it helps me to figure out what has happened to a hard drive.</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;&nbsp;&nbsp; Well, that's about it!&nbsp; Check out the <a href="http://www.teleport.com/%7Ebrainy/interrupts.htm">Interrupts</a> Page for a listing of
+all the Interrupts shown in this document.</p>
+
+<p align="center"><a href="http://www.teleport.com/%7Ebrainy">Home</a> <a href="http://www.teleport.com/%7Ebrainy/rps.html">Reference Point Software</a> <a href="http://www.teleport.com/%7Ebrainy/fat32.htm">FAT32 Structure Information</a> <a href="http://www.teleport.com/%7Ebrainy/fat16.htm">FAT16 Structure Information</a> Disk
+Access Information<br>
+<a href="http://www.teleport.com/%7Ebrainy/bio.html">About Me</a> <a href="http://www.teleport.com/%7Ebrainy/links.html">Links</a> <a href="http://www.teleport.com/%7Ebrainy/dobiash.html">Dobiash?</a></p>
+</body></html>

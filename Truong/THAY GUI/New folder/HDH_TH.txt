@@ -1,0 +1,465 @@
+===========Doc BootSector=========================
+#include <stdio.h>
+#include <conio.h>
+#include "dos.h"
+#include "stdlib.h"
+
+#define byte unsigned char
+#define word unsigned int
+#define long unsigned long
+
+typedef struct BootSector
+{
+	byte Ma[3];
+	byte Version[8];
+	word BytePerSector;
+	byte SectorPerCluster;
+	word ReservedSector;
+	byte FatNum;
+	word RootEntry;
+	word Sum_Sector;
+	byte MediaDescriptor;
+	word SectorPerFat;
+	word SectorPerTrack;
+	word HeadPerDisk;
+	long HiddenSector;
+	long SumSector;
+	byte PhysicDisk;
+	byte Danhrieng;
+	byte KiHieuNhanDien;
+	byte SerialNumber[4];
+	byte VolumeLabel[11];
+	byte FATID[8];
+	byte Rest[450];
+};
+
+void main()
+{
+	clrscr();
+	BootSector bs;
+	if (absread(0,1,0,&bs) != 0)
+	{
+		printf("Loi doc dia");
+		getch();
+		exit(0);
+	}
+	printf("Bang tham so dia :");
+	printf("\nVersion: ");
+	for (int i=0; i<8; i++)
+		printf("%c",bs.Version[i]);
+	printf("\nSo byte cua sector = %d",bs.BytePerSector);
+	printf("\nSo sector cua cluster = %d",bs.SectorPerCluster);
+	getch();
+
+}
+===========Liet ke noi dung thu muc goc==============
+#include <stdio.h>
+#include <conio.h>
+#include <dos.h>
+#include <stdlib.h>
+
+typedef unsigned char BYTE;
+typedef unsigned int WORD;
+typedef unsigned long DWORD;
+
+typedef struct ENTRY
+{
+	BYTE FileName[8];
+	BYTE FileExt[3];
+	BYTE Attrib;
+	BYTE Reserved[10];
+	WORD Time;
+	WORD Date;
+	WORD FirstCluster;
+	DWORD FileSize;
+};
+
+void main()
+{
+	clrscr();
+	ENTRY RDET[224];
+	if (absread(0,14,19,RDET) != 0)
+	{
+		printf("loi doc sector");
+		getch();
+		exit(0);
+	}
+	for (int i=0; i<224; i++)
+	{
+		if ((RDET[i].FileName[0] != 0) &&
+		(RDET[i].FileName[0] != 0xE5))
+		{
+			for (int j=0; j<8; j++)
+				printf("%c",RDET[i].FileName[j]);
+			printf(".");
+			for (int k=0; k<3; k++)
+				printf("%c",RDET[i].FileExt[k]);
+			printf("\n");
+		}
+	}
+
+	getch();
+}
+
+================Doc bang FAT=======================
+#include <stdio.h>
+#include <conio.h>
+#include <dos.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+typedef unsigned char BYTE;
+typedef unsigned int WORD;
+typedef unsigned long DWORD;
+
+typedef struct ENTRY
+{
+	BYTE FileName[8];
+	BYTE FileExt[3];
+	BYTE Attrib;
+	BYTE Reserved[10];
+	WORD Time;
+	WORD Date;
+	WORD FirstCluster;
+	DWORD FileSize;
+};
+
+void ChuanHoa(char* s)
+{
+	int len = strlen(s);
+	for (int i=0; i<len; i++)
+		s[i] = toupper(s[i]);
+	for (int j=len; j<8; j++)
+		s[j] = ' ';
+}
+
+int GetFatValue(int k, unsigned char* Fat)
+{
+	int i = (k*3)/2;
+	int nHi = Fat[i+1];
+	int nLo = Fat[i];
+
+	if (k%2 == 0) return (nLo | ((nHi & 0xF) << 8));
+	else return ((nHi << 4) | (nLo >> 4));
+}
+
+void HienThi(int sector)
+{
+	BYTE buf[513];
+	if (absread(1,1,sector,buf) != 0)
+	{
+		printf("loi doc sector %",sector);
+		getch();
+		exit(0);
+	}
+	buf[512]='\0';
+	printf("%s",buf);
+}
+
+void main()
+{
+	clrscr();
+	char s[256];
+	printf("Nhap ten tap tin: ");
+	//gets(s);
+	scanf("%s",s);
+	ChuanHoa(s);
+	ENTRY RDET[224];
+	BYTE FAT[9*512];
+	if (absread(0,14,19,RDET) != 0)
+	{
+		printf("loi doc RDET");
+		getch();
+		exit(0);
+	}
+	if (absread(0,9,1,FAT) != 0)
+	{
+		printf("loi doc FAT");
+		getch();
+		exit(0);
+	}
+	for (int i=0; i<224; i++)
+	{
+		if (strncmp(s,RDET[i].FileName,8) == 0)
+		{
+			printf("Ten tap tin tim duoc: ");
+			for (int j=0; j<8; j++)
+				printf("%c",RDET[i].FileName[j]);
+			printf(".");
+			for (int k=0; k<3; k++)
+				printf("%c",RDET[i].FileExt[k]);
+			printf("\n");
+
+			printf("Cac phan tu FAT: ");
+			int cluster = RDET[i].FirstCluster;
+			while (cluster != 0xFFF)
+			{
+				printf("%d ",cluster);
+				cluster = GetFatValue(cluster,FAT);
+			}
+
+			printf("\nNoi dung cua tap tin: \n");
+			cluster = RDET[i].FirstCluster;
+			while (cluster != 0xFFF)
+			{
+				getch();
+				HienThi(cluster+31);
+				cluster = GetFatValue(cluster,FAT);
+			}
+		}
+	}
+
+	printf("\nNhan phim bat ky de thoat ...");
+	getch();
+}
+
+=================Xoa tap tin===============
+#include <stdio.h>
+#include <conio.h>
+#include <dos.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+typedef unsigned char BYTE;
+typedef unsigned int WORD;
+typedef unsigned long DWORD;
+
+typedef struct ENTRY
+{
+	BYTE FileName[8];
+	BYTE FileExt[3];
+	BYTE Attrib;
+	BYTE Reserved[10];
+	WORD Time;
+	WORD Date;
+	WORD FirstCluster;
+	DWORD FileSize;
+};
+
+void ChuanHoa(char* s)
+{
+	int len = strlen(s);
+	for (int i=0; i<len; i++)
+		s[i] = toupper(s[i]);
+	for (int j=len; j<8; j++)
+		s[j] = ' ';
+}
+
+int GetFatValue(int k, unsigned char* Fat)
+{
+	int i = (k*3)/2;
+	int nHi = Fat[i+1];
+	int nLo = Fat[i];
+
+	if (k%2 == 0) return (nLo | ((nHi & 0xF) << 8));
+	else return ((nHi << 4) | (nLo >> 4));
+}
+
+void SetFatValue(int k, int value, unsigned char* Fat)
+{
+	unsigned char nHi, nLo;
+	int i = (k*3)/2;
+	if (k%2==0)
+	{
+		nHi = (value & 0x0F00) >> 8;
+		nLo = value & 0x0FF;
+		Fat[i+1] = (Fat[i+1] & 0x0F0) | nHi;
+		Fat[i] = nLo;
+	}
+	else
+	{
+		nHi = (value & 0x0FF0) >> 4;
+		nLo = (value & 0x0F) << 4;
+		Fat[i] = (Fat[i] & 0x0F) | nLo;
+		Fat[i+1] = nHi;
+	}
+}
+
+void main()
+{
+	clrscr();
+	char s[256];
+	printf("Nhap ten tap tin: ");
+	//gets(s);
+	scanf("%s",s);
+	ChuanHoa(s);
+	ENTRY RDET[224];
+	BYTE FAT[9*512];
+	if (absread(0,14,19,RDET) != 0)
+	{
+		printf("loi doc RDET");
+		getch();
+		exit(0);
+	}
+	if (absread(0,9,1,FAT) != 0)
+	{
+		printf("loi doc FAT");
+		getch();
+		exit(0);
+	}
+	for (int i=0; i<224; i++)
+	{
+		if (strncmp(s,RDET[i].FileName,8) == 0)
+		{
+			printf("Ten tap tin tim duoc: ");
+			for (int j=0; j<8; j++)
+				printf("%c",RDET[i].FileName[j]);
+			printf(".");
+			for (int k=0; k<3; k++)
+				printf("%c",RDET[i].FileExt[k]);
+			printf("\n");
+
+			printf("Cac phan tu FAT: ");
+			int cluster = RDET[i].FirstCluster;
+			while (cluster != 0xFFF)
+			{
+				printf("%d ",cluster);
+				cluster = GetFatValue(cluster,FAT);
+			}
+			// Xoa tap tin
+			printf("\nNhan 1 phim de xoa tap tin nay");
+			getch();
+			RDET[i].FileName[0] = 0xE5;
+			cluster = RDET[i].FirstCluster;
+			int temp;
+			while ((temp=GetFatValue(cluster,FAT)) != 0xFFF)
+			{
+				SetFatValue(cluster,0,FAT);
+				cluster = temp;
+			}
+			SetFatValue(cluster,0,FAT);
+			printf("\nXoa xong");
+
+			// Cap nhat lai dia
+			if (abswrite(0,14,19,RDET) != 0)
+			{
+				printf("loi ghi RDET");
+				getch();
+				exit(0);
+			}
+			if (abswrite(0,9,1,FAT) != 0)
+			{
+				printf("loi ghi FAT");
+				getch();
+				exit(0);
+			}
+		}
+	}
+
+	printf("\nNhan phim bat ky de thoat ...");
+	getch();
+}
+=====================Gia lap lenh TYPE==========================
+#include <stdio.h>
+#include <conio.h>
+#include <dos.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+typedef unsigned char BYTE;
+typedef unsigned int WORD;
+typedef unsigned long DWORD;
+
+typedef struct ENTRY
+{
+	BYTE FileName[8];
+	BYTE FileExt[3];
+	BYTE Attrib;
+	BYTE Reserved[10];
+	WORD Time;
+	WORD Date;
+	WORD FirstCluster;
+	DWORD FileSize;
+};
+
+void ChuanHoa(char* s)
+{
+	int len = strlen(s);
+	for (int i=0; i<len; i++)
+		s[i] = toupper(s[i]);
+	for (int j=len; j<8; j++)
+		s[j] = ' ';
+}
+
+int GetFatValue(int k, unsigned char* Fat)
+{
+	int i = (k*3)/2;
+	int nHi = Fat[i+1];
+	int nLo = Fat[i];
+
+	if (k%2 == 0) return (nLo | ((nHi & 0xF) << 8));
+	else return ((nHi << 4) | (nLo >> 4));
+}
+
+void HienThi(int sector)
+{
+	BYTE buf[513];
+	if (absread(0,1,sector,buf) != 0)
+	{
+		printf("loi doc sector %",sector);
+		getch();
+		exit(0);
+	}
+	buf[512]='\0';
+	printf("%s",buf);
+}
+
+void main()
+{
+	clrscr();
+	char s[256];
+	printf("Nhap ten tap tin: ");
+	//gets(s);
+	scanf("%s",s);
+	ChuanHoa(s);
+	ENTRY RDET[224];
+	BYTE FAT[9*512];
+	if (absread(0,14,19,RDET) != 0)
+	{
+		printf("loi doc RDET");
+		getch();
+		exit(0);
+	}
+	if (absread(0,9,1,FAT) != 0)
+	{
+		printf("loi doc FAT");
+		getch();
+		exit(0);
+	}
+	for (int i=0; i<224; i++)
+	{
+		if (strncmp(s,RDET[i].FileName,8) == 0)
+		{
+			printf("Ten tap tin tim duoc: ");
+			for (int j=0; j<8; j++)
+				printf("%c",RDET[i].FileName[j]);
+			printf(".");
+			for (int k=0; k<3; k++)
+				printf("%c",RDET[i].FileExt[k]);
+			printf("\n");
+
+			printf("Cac phan tu FAT: ");
+			int cluster = RDET[i].FirstCluster;
+			while (cluster != 0xFFF)
+			{
+				printf("%d ",cluster);
+				cluster = GetFatValue(cluster,FAT);
+			}
+
+			printf("\nNoi dung cua tap tin: \n");
+			cluster = RDET[i].FirstCluster;
+			while (cluster != 0xFFF)
+			{
+				getch();
+				HienThi(cluster+31);
+				cluster = GetFatValue(cluster,FAT);
+			}
+		}
+	}
+
+	printf("\nNhan phim bat ky de thoat ...");
+	getch();
+}

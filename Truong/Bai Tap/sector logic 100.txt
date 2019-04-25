@@ -1,0 +1,5 @@
+So sector tren 1 cylinder = 18*2=36 sector
+sector logic thu 100 thuoc cylinder: 100 div 36 =2 (du 28)
+sector logic 100 thuoc head: (100 mod 36 ) div 18 = 1 (du 10)
+sector logic 100 thuoc sector vatly: (100 mod 36 ) mod 18 +1 =11
+KL: Sector logic thu 100 thuoc sector vat ly (11, 2, 1)
