@@ -1,0 +1,9 @@
+Dung Winhex mo file img1.img trên Desktop va thuc hien cac yeu cau sau:
+a. Tính cac thong so Sb, Sf, Nf, Sr, Sb, Sc
+b. Cho biet Vol hien chua bao nhieu tap tin/thu muc thuoc thu muc goc
+c. Voi tap tin TEXTFI~1.WHS
+ - Ten dai:
+ - Ngay cap nhat gan nhat:
+ - Gio tao: 
+ - Kich thuoc:
+ - Noi dung tap tin chiem cac cluster nào? sector nào?
